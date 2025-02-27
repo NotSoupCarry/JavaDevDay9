@@ -26,6 +26,8 @@ public class EsercizoZ1 {
 
                 System.out.println("\nFINE");
 
+                statement.close();
+                conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -89,7 +91,9 @@ public class EsercizoZ1 {
                     { "Pompei Scavi", "ITA", "Campania", "154000" },
                     { "Pompei nuova", "ITA", "Campania", "183000" },
                     { "Pompei vecchia", "ITA", "Campania", "204000" },
-                    { "Pompei 2077", "ITA", "Campania", "204000" } 
+                    { "Pompei 2077", "ITA", "Campania", "204000" },
+                    { "Pompei cyberpunk", "ITA", "Campania", "204000" }
+
             };
 
             int aggiunte = 0; // Contatore per città aggiunte
