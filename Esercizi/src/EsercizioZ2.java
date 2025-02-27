@@ -18,6 +18,8 @@ public class EsercizioZ2 {
     // Constati db
     private static final int LUNGHEZZA_STRINGA_COUNTRYCODE = 3;
     private static final int LUNGHEZZA_STRINGA_COUNTRYCODE2 = 2;
+    private static final String[] CONTINENTI = { "Asia", "Europe", "North America", "Africa", "Oceania", "Antarctica",
+            "South America" };
     // #endregion
 
     // Metodo per la connessione
@@ -187,15 +189,12 @@ public class EsercizioZ2 {
 
     // Metodo per controllare se il continente è valido
     public static String controlloContinentInput(Scanner scanner) {
-        String[] continentiValidi = { "Asia", "Europe", "North America", "Africa", "Oceania", "Antarctica",
-                "South America" };
         String continent = null;
-
         do {
             continent = controlloInputStringhe(scanner); // Usa il tuo metodo per ottenere l'input dell'utente
             // Controlla se l'input è valido
             boolean valido = false;
-            for (String continente : continentiValidi) {
+            for (String continente : CONTINENTI) {
                 if (continent.equalsIgnoreCase(continente)) {
                     valido = true;
                     break;
@@ -212,9 +211,7 @@ public class EsercizioZ2 {
 
     // Metodo per verificare se il continente è valido
     public static boolean isValidContinent(String continent) {
-        String[] continentiValidi = { "Asia", "Europe", "North America", "Africa", "Oceania", "Antarctica",
-                "South America" };
-        for (String continente : continentiValidi) {
+        for (String continente : CONTINENTI) {
             if (continent.equalsIgnoreCase(continente)) {
                 return true;
             }
@@ -222,6 +219,20 @@ public class EsercizioZ2 {
         return false;
     }
 
+    // Metodo per chiedere all'utente se vuole che il valore sia null (y/n)
+    public static boolean chiediSeNull(Scanner scanner, String messaggio) {
+        String risposta;
+        do {
+            System.out.print(messaggio + " (y/n): ");
+            risposta = scanner.next().trim().toLowerCase();
+            scanner.nextLine(); // Pulisce il buffer dopo next()
+            if (!risposta.equals("y") && !risposta.equals("n")) {
+                System.out.println("Input non valido! Inserisci solo 'y' o 'n'.");
+            }
+        } while (!risposta.equals("y") && !risposta.equals("n"));
+
+        return risposta.equals("y"); // Ritorna true se l'utente ha scelto 'y' (quindi null)
+    }
     // #endregion
 
     // #region METODI PER LA GESTIONE DELLE MODIFICHE E VISUALIZZAZIONE SUL DB
@@ -464,8 +475,9 @@ public class EsercizioZ2 {
         System.out.print("Inserisci il nome della città: ");
         String name = controlloInputStringhe(input);
 
-        System.out.print("Inserisci il continente ('Asia', 'Europe', 'North America', 'Africa', 'Oceania', 'Antarctica', 'South America'): ");
-        String continent = controlloContinentInput(input); 
+        System.out.print(
+                "Inserisci il continente ('Asia', 'Europe', 'North America', 'Africa', 'Oceania', 'Antarctica', 'South America'): ");
+        String continent = controlloContinentInput(input);
 
         System.out.print("Inserisci la regione: ");
         String region = controlloInputStringhe(input);
@@ -473,20 +485,40 @@ public class EsercizioZ2 {
         System.out.print("Inserisci la superficie: ");
         Double surfaceArea = controlloInputDouble(input);
 
-        System.out.print("Inserisci l'anno di indipendenza: ");
-        Integer indepYear = controlloInputInteri(input);
+        // Chiedi se l'utente vuole un valore null per l'anno di indipendenza
+        boolean allowNullIndepYear = chiediSeNull(input, "Vuoi che l'anno di indipendenza sia null?");
+        Integer indepYear = null;
+        if (!allowNullIndepYear) {
+            System.out.print("Inserisci l'anno di indipendenza: ");
+            indepYear = controlloInputInteri(input); // Chiamata al tuo metodo esistente
+        }
 
         System.out.print("Inserisci il numero della popolazione: ");
         Integer population = controlloInputInteri(input);
 
-        System.out.print("Inserisci l'aspettativa di vita: ");
-        Integer lifeExpectancy = controlloInputInteri(input);
+        // Chiedi se l'utente vuole un valore null per l'aspettativa di vita
+        boolean allowNullLifeExpectancy = chiediSeNull(input, "Vuoi che l'aspettativa di vita sia null?");
+        Integer lifeExpectancy = null;
+        if (!allowNullLifeExpectancy) {
+            System.out.print("Inserisci l'aspettativa di vita: ");
+            lifeExpectancy = controlloInputInteri(input); // Chiamata al tuo metodo esistente
+        }
 
-        System.out.print("Inserisci GNP: ");
-        Double gnp = controlloInputDouble(input);
+        // Chiedi se l'utente vuole un valore null per GNP
+        boolean allowNullGnp = chiediSeNull(input, "Vuoi che GNP sia null?");
+        Double gnp = null;
+        if (!allowNullGnp) {
+            System.out.print("Inserisci GNP: ");
+            gnp = controlloInputDouble(input); // Metodo per gestire input double
+        }
 
-        System.out.print("Inserisci GNP-OLD: ");
-        Double gnpOld = controlloInputDouble(input);
+        // Chiedi se l'utente vuole un valore null per GNP-OLD
+        boolean allowNullGnpOld = chiediSeNull(input, "Vuoi che GNP-OLD sia null?");
+        Double gnpOld = null;
+        if (!allowNullGnpOld) {
+            System.out.print("Inserisci GNP-OLD: ");
+            gnpOld = controlloInputDouble(input); // Metodo per gestire input double
+        }
 
         System.out.print("Inserisci il Local Name: ");
         String localName = controlloInputStringhe(input);
@@ -494,11 +526,21 @@ public class EsercizioZ2 {
         System.out.print("Inserisci il governament: ");
         String governmentForm = controlloInputStringhe(input);
 
-        System.out.print("Inserisci headOfState: ");
-        String headOfState = controlloInputStringhe(input);
+        // Chiedi se l'utente vuole un valore null per headOfState
+        boolean allowNullHeadOfState = chiediSeNull(input, "Vuoi che headOfState sia null?");
+        String headOfState = null;
+        if (!allowNullHeadOfState) {
+            System.out.print("Inserisci headOfState: ");
+            headOfState = input.nextLine(); // Nessun controllo perchè permette campi null
+        }
 
-        System.out.print("Inserisci capital: ");
-        Integer capital = controlloInputInteri(input);
+        // Chiedi se l'utente vuole un valore null per capital
+        boolean allowNullCapital = chiediSeNull(input, "Vuoi che capital sia null?");
+        Integer capital = null;
+        if (!allowNullCapital) {
+            System.out.print("Inserisci capital: ");
+            capital = controlloInputInteri(input); // Chiamata al tuo metodo esistente
+        }
 
         System.out.print("Inserisci code2: ");
         String code2 = controlloInputStringheConLunghezza(input, LUNGHEZZA_STRINGA_COUNTRYCODE2);
@@ -515,15 +557,43 @@ public class EsercizioZ2 {
             pstmt.setString(3, continent);
             pstmt.setString(4, region);
             pstmt.setDouble(5, surfaceArea);
-            pstmt.setInt(6, indepYear);
+
+            if (indepYear != null) {
+                pstmt.setInt(6, indepYear); // Se c'è un numero, lo inserisce normalmente
+            } else {
+                pstmt.setString(6, null); // Se è null, inserisce un NULL nel database
+            }
+
             pstmt.setLong(7, population);
-            pstmt.setDouble(8, lifeExpectancy);
-            pstmt.setDouble(9, gnp);
-            pstmt.setDouble(10, gnpOld);
+
+            if (lifeExpectancy != null) {
+                pstmt.setInt(8, lifeExpectancy); // Se c'è un numero, lo inserisce normalmente
+            } else {
+                pstmt.setString(8, null); // Se è null, inserisce un NULL nel database
+            }
+
+            if (gnp != null) {
+                pstmt.setDouble(9, gnp); // Se c'è un numero, lo inserisce normalmente
+            } else {
+                pstmt.setString(9, null); // Se è null, inserisce un NULL nel database
+            }
+
+            if (gnpOld != null) {
+                pstmt.setDouble(10, gnpOld); // Se c'è un numero, lo inserisce normalmente
+            } else {
+                pstmt.setString(10, null); // Se è null, inserisce un NULL nel database
+            }
+
             pstmt.setString(11, localName);
             pstmt.setString(12, governmentForm);
             pstmt.setString(13, headOfState);
-            pstmt.setInt(14, capital);
+
+            if (capital != null) {
+                pstmt.setInt(14, capital); // Se c'è un numero, lo inserisce normalmente
+            } else {
+                pstmt.setString(14, null); // Se è null, inserisce un NULL nel database
+            }
+
             pstmt.setString(15, code2.toUpperCase());
 
             // Eseguiamo l'inserimento
@@ -836,5 +906,4 @@ public class EsercizioZ2 {
     }
 
     // #endregion
-
 }
