@@ -181,6 +181,21 @@ public class EsercizioZ2 {
         return valore;
     }
 
+    // Metodo per verificare se un paese esiste nel database
+    private static boolean esistePaese(Connection conn, String countryCode) throws SQLException {
+        String query = "SELECT COUNT(*) FROM country WHERE Code = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, countryCode);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                return true; // Il paese esiste
+            } else {
+                System.out.println("Il codice del paese " + countryCode + " non esiste nel database.");
+                return false; // Il paese non esiste
+            }
+        }
+    }
+
     // #endregion
 
     // #region METODI PER LA GESTIONE DELLE MODIFICHE E VISUALIZZAZIONE SUL DB
@@ -247,11 +262,18 @@ public class EsercizioZ2 {
 
     // Metodo per scambiare due reord in country
     public static void scambiaRecordCountry(Connection conn, Scanner input) throws SQLException {
-        System.out.print("Inserisci il codice del primo paese: ");
-        String country1 = controlloInputStringheConLunghezza(input, LUNGHEZZA_STRINGA_COUNTRYCODE);
+        String country1;
+        do {
+            System.out.print("Inserisci il codice del primo paese (3 caratteri): ");
+            country1 = controlloInputStringheConLunghezza(input, LUNGHEZZA_STRINGA_COUNTRYCODE);
+        } while (!esistePaese(conn, country1)); // Verifica se il paese esiste nel DB
 
-        System.out.print("Inserisci il codice del secondo paese: ");
-        String country2 = controlloInputStringheConLunghezza(input, LUNGHEZZA_STRINGA_COUNTRYCODE);
+        // Chiedi il codice del secondo paese, finché non esiste nel database
+        String country2;
+        do {
+            System.out.print("Inserisci il codice del secondo paese (3 caratteri): ");
+            country2 = controlloInputStringheConLunghezza(input, LUNGHEZZA_STRINGA_COUNTRYCODE);
+        } while (!esistePaese(conn, country2)); // Verifica se il paese esiste nel DB
 
         // Interrogare i nomi dei paesi per scambiarli
         String selectQuery = "SELECT Name FROM country WHERE Code = ?";
