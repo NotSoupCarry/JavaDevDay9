@@ -657,18 +657,42 @@ public class EsercizioZ2 {
         }
     }
 
-    // Creazione della tabella di backup per 'city'
+    // Metodo per creare o sovrascrivere la tabella di backup per 'city'
     public static void creazioneBackupCity(Connection conn) throws SQLException {
-        String createCityBackupQuery = "CREATE TABLE IF NOT EXISTS city_backup LIKE city;";
         Statement stmt = getStatement(conn);
-        stmt.executeUpdate(createCityBackupQuery);
+
+        // Elimina la tabella di backup se esiste già
+        String dropQuery = "DROP TABLE IF EXISTS city_backup;";
+        stmt.executeUpdate(dropQuery);
+
+        // Ricrea la tabella di backup con la stessa struttura di 'city'
+        String createQuery = "CREATE TABLE city_backup LIKE city;";
+        stmt.executeUpdate(createQuery);
+
+        // Copia i dati attuali della tabella 'city' nella tabella di backup
+        String insertQuery = "INSERT INTO city_backup SELECT * FROM city;";
+        stmt.executeUpdate(insertQuery);
+
+        System.out.println("Backup della tabella 'city' completato con successo.");
     }
 
-    // Creazione della tabella di backup per 'country'
+    // Metodo per creare o sovrascrivere la tabella di backup per 'country'
     public static void creazioneBackupCountry(Connection conn) throws SQLException {
-        String createCountryBackupQuery = "CREATE TABLE IF NOT EXISTS country_backup LIKE country;";
         Statement stmt = getStatement(conn);
-        stmt.executeUpdate(createCountryBackupQuery);
+
+        // Elimina la tabella di backup se esiste già
+        String dropQuery = "DROP TABLE IF EXISTS country_backup;";
+        stmt.executeUpdate(dropQuery);
+
+        // Ricrea la tabella di backup con la stessa struttura di 'country'
+        String createQuery = "CREATE TABLE country_backup LIKE country;";
+        stmt.executeUpdate(createQuery);
+
+        // Copia i dati attuali della tabella 'country' nella tabella di backup
+        String insertQuery = "INSERT INTO country_backup SELECT * FROM country;";
+        stmt.executeUpdate(insertQuery);
+
+        System.out.println("Backup della tabella 'country' completato con successo.");
     }
 
     // #endregion
@@ -721,8 +745,8 @@ public class EsercizioZ2 {
             System.out.println("3. Eliminare una città specifica.");
             System.out.println("4. Aggiornare il numero di abitanti di un paese.");
             System.out.println("5. Aggiungere un nuovo paese nel database.");
-            System.out.println("6. Creare una tabella backup per city.");
-            System.out.println("7. Creare una tabella backup per country.");
+            System.out.println("6. Creare una tabella backup per city. (cancella vecchio backupCity)");
+            System.out.println("7. Creare una tabella backup per country. (cancella vecchio backupCountry)");
             System.out.println("8. Scambiare di posto due record nelle tabella country.");
             System.out.println("9. Scambiare di posto due record nelle tabella city.");
             System.out.println("10. Aggiungere un Trigger per quando viene eliminata una city o un country.");
