@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class EsercizioZ2 {
 
-    //#region CONSTANTI
+    // #region CONSTANTI
     // Costanti dati di connessione
     private static final String DB_URL = "jdbc:mysql://localhost:3306/world";
     private static final String DB_USERNAME = "root";
@@ -18,7 +18,7 @@ public class EsercizioZ2 {
     // Constati db
     private static final int LUNGHEZZA_STRINGA_COUNTRYCODE = 3;
     private static final int LUNGHEZZA_STRINGA_COUNTRYCODE2 = 2;
-    //#endregion
+    // #endregion
 
     // Metodo per la connessione
     public static Connection connessioneDatabase() {
@@ -125,6 +125,7 @@ public class EsercizioZ2 {
                 System.out.print("Il numero non può essere negativo. Riprova: ");
             }
         } while (valore < 0);
+        scanner.next();
         return valore;
     }
 
@@ -184,6 +185,44 @@ public class EsercizioZ2 {
             }
         }
     }
+
+    // Metodo per controllare se il continente è valido
+    public static String controlloContinentInput(Scanner scanner) {
+        String[] continentiValidi = { "Asia", "Europe", "North America", "Africa", "Oceania", "Antarctica",
+                "South America" };
+        String continent = null;
+
+        do {
+            continent = controlloInputStringhe(scanner); // Usa il tuo metodo per ottenere l'input dell'utente
+            // Controlla se l'input è valido
+            boolean valido = false;
+            for (String continente : continentiValidi) {
+                if (continent.equalsIgnoreCase(continente)) {
+                    valido = true;
+                    break;
+                }
+            }
+
+            if (!valido) {
+                System.out.print("Continente non valido. Riprova: ");
+            }
+        } while (continent == null || !isValidContinent(continent));
+
+        return continent;
+    }
+
+    // Metodo per verificare se il continente è valido
+    private static boolean isValidContinent(String continent) {
+        String[] continentiValidi = { "Asia", "Europe", "North America", "Africa", "Oceania", "Antarctica",
+                "South America" };
+        for (String continente : continentiValidi) {
+            if (continent.equalsIgnoreCase(continente)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // #endregion
 
     // #region METODI PER LA GESTIONE DELLE MODIFICHE E VISUALIZZAZIONE SUL DB
@@ -426,8 +465,8 @@ public class EsercizioZ2 {
         System.out.print("Inserisci il nome della città: ");
         String name = controlloInputStringhe(input);
 
-        System.out.print("Inserisci il continente: ");
-        String continent = controlloInputStringhe(input);
+        System.out.print("Inserisci il continente ('Asia', 'Europe', 'North America', 'Africa', 'Oceania', 'Antarctica', 'South America'): ");
+        String continent = controlloContinentInput(input); 
 
         System.out.print("Inserisci la regione: ");
         String region = controlloInputStringhe(input);
@@ -442,7 +481,7 @@ public class EsercizioZ2 {
         Integer population = controlloInputInteri(input);
 
         System.out.print("Inserisci l'aspettativa di vita: ");
-        Integer lifeExpectancy = controlloInputInteri(input); 
+        Integer lifeExpectancy = controlloInputInteri(input);
 
         System.out.print("Inserisci GNP: ");
         Double gnp = controlloInputDouble(input);
@@ -457,7 +496,7 @@ public class EsercizioZ2 {
         String governmentForm = controlloInputStringhe(input);
 
         System.out.print("Inserisci headOfState: ");
-        String headOfState = controlloInputStringhe(input); 
+        String headOfState = controlloInputStringhe(input);
 
         System.out.print("Inserisci capital (può essere null): ");
         Integer capital = controlloInputInteri(input);
@@ -472,7 +511,7 @@ public class EsercizioZ2 {
 
         try (PreparedStatement pstmt = createPreparedStatement(conn, sql)) {
             // Impostiamo i parametri nella query
-            pstmt.setString(1, code);
+            pstmt.setString(1, code.toUpperCase());
             pstmt.setString(2, name);
             pstmt.setString(3, continent);
             pstmt.setString(4, region);
@@ -486,7 +525,7 @@ public class EsercizioZ2 {
             pstmt.setString(12, governmentForm);
             pstmt.setString(13, headOfState);
             pstmt.setInt(14, capital);
-            pstmt.setString(15, code2);
+            pstmt.setString(15, code2.toUpperCase());
 
             // Eseguiamo l'inserimento
             int rowsAffected = pstmt.executeUpdate();
