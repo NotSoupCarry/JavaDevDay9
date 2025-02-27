@@ -498,7 +498,7 @@ public class EsercizioZ2 {
         System.out.print("Inserisci headOfState: ");
         String headOfState = controlloInputStringhe(input);
 
-        System.out.print("Inserisci capital (può essere null): ");
+        System.out.print("Inserisci capital: ");
         Integer capital = controlloInputInteri(input);
 
         System.out.print("Inserisci code2: ");
