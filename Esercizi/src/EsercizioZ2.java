@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public class EsercizioZ2 {
 
+    //#region CONSTANTI
     // Costanti dati di connessione
     private static final String DB_URL = "jdbc:mysql://localhost:3306/world";
     private static final String DB_USERNAME = "root";
@@ -17,6 +18,7 @@ public class EsercizioZ2 {
     // Constati db
     private static final int LUNGHEZZA_STRINGA_COUNTRYCODE = 3;
     private static final int LUNGHEZZA_STRINGA_COUNTRYCODE2 = 2;
+    //#endregion
 
     // Metodo per la connessione
     public static Connection connessioneDatabase() {
