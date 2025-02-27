@@ -563,7 +563,7 @@ public class EsercizioZ2 {
         try (PreparedStatement pstmt = createPreparedStatement(conn, sql)) {
             // Impostiamo i parametri nella query
             pstmt.setString(1, name);
-            pstmt.setString(2, countryCode);
+            pstmt.setString(2, countryCode.toUpperCase());
             pstmt.setString(3, district);
             pstmt.setInt(4, population);
 
