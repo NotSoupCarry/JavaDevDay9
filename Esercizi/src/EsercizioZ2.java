@@ -212,7 +212,7 @@ public class EsercizioZ2 {
     }
 
     // Metodo per verificare se il continente è valido
-    private static boolean isValidContinent(String continent) {
+    public static boolean isValidContinent(String continent) {
         String[] continentiValidi = { "Asia", "Europe", "North America", "Africa", "Oceania", "Antarctica",
                 "South America" };
         for (String continente : continentiValidi) {
