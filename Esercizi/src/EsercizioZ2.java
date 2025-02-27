@@ -9,16 +9,17 @@ import java.util.Scanner;
 
 public class EsercizioZ2 {
 
+    // Costanti dati di connessione
+    private static final String DB_URL = "jdbc:mysql://localhost:3306/world";
+    private static final String DB_USERNAME = "root";
+    private static final String DB_PASSWORD = "root";
+
+    // Constati db
     private static final int LUNGHEZZA_STRINGA_COUNTRYCODE = 3;
     private static final int LUNGHEZZA_STRINGA_COUNTRYCODE2 = 2;
 
     // Metodo per la connessione
     public static Connection connessioneDatabase() {
-        // Dati di connessione
-        String DB_URL = "jdbc:mysql://localhost:3306/world";
-        String DB_USERNAME = "root";
-        String DB_PASSWORD = "root";
-
         Connection conn = null;
 
         try {
@@ -88,6 +89,7 @@ public class EsercizioZ2 {
             return null;
         }
     }
+
     // #endregion
 
     // #region METODI PER IL CONTROLLO DEGLI INPUT
@@ -196,6 +198,20 @@ public class EsercizioZ2 {
         }
     }
 
+    // Metodo per verificare se una città esiste nel database
+    private static boolean esisteCitta(Connection conn, String cityName) throws SQLException {
+        String query = "SELECT COUNT(*) FROM city WHERE Name = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, cityName);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                return true; // La città esiste
+            } else {
+                System.out.println("La città con nome " + cityName + " non esiste nel database.");
+                return false; // La città non esiste
+            }
+        }
+    }
     // #endregion
 
     // #region METODI PER LA GESTIONE DELLE MODIFICHE E VISUALIZZAZIONE SUL DB
@@ -260,7 +276,7 @@ public class EsercizioZ2 {
         }
     }
 
-    // Metodo per scambiare due reord in country
+    // Metodo per scambiare due record in country
     public static void scambiaRecordCountry(Connection conn, Scanner input) throws SQLException {
         String country1;
         do {
@@ -318,6 +334,68 @@ public class EsercizioZ2 {
             pstmt1.executeUpdate();
 
             System.out.println("Scambio tra i paesi con codice " + country1 + " e " + country2 + " completato.");
+        }
+    }
+
+    // Metodo per scambiare due record nella tabella city
+    public static void scambiaRecordCity(Connection conn, Scanner input) throws SQLException {
+        // Chiedi il nome della prima città, finché non esiste nel database
+        String city1;
+        do {
+            System.out.print("Inserisci il nome della prima città: ");
+            city1 = controlloInputStringhe(input);
+        } while (!esisteCitta(conn, city1)); // Verifica se la città esiste nel DB
+
+        // Chiedi il nome della seconda città, finché non esiste nel database
+        String city2;
+        do {
+            System.out.print("Inserisci il nome della seconda città: ");
+            city2 = controlloInputStringhe(input);
+        } while (!esisteCitta(conn, city2)); // Verifica se la città esiste nel DB
+
+        // Interrogare i nomi delle città per scambiarli
+        String selectQuery = "SELECT Name FROM city WHERE Name = ?";
+        String tempCity1Name = null, tempCity2Name = null;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(selectQuery)) {
+            // Recupera il nome della prima città
+            pstmt.setString(1, city1);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                tempCity1Name = rs.getString("Name");
+            }
+
+            // Recupera il nome della seconda città
+            pstmt.setString(1, city2);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                tempCity2Name = rs.getString("Name");
+            }
+        }
+
+        // Usa un PreparedStatement per aggiornare i record nella tabella 'city'
+        String updateQuery1 = "UPDATE city SET Name = ? WHERE Name = ?";
+        String updateQuery2 = "UPDATE city SET Name = ? WHERE Name = ?";
+
+        try (PreparedStatement pstmt1 = conn.prepareStatement(updateQuery1);
+                PreparedStatement pstmt2 = conn.prepareStatement(updateQuery2)) {
+
+            // 1. Aggiorna la prima città con un nome temporaneo
+            pstmt1.setString(1, "TEMP");
+            pstmt1.setString(2, city1);
+            pstmt1.executeUpdate();
+
+            // 2. Aggiorna la seconda città con il nome della prima città
+            pstmt2.setString(1, tempCity1Name);
+            pstmt2.setString(2, city2);
+            pstmt2.executeUpdate();
+
+            // 3. Aggiorna la prima città con il nome della seconda città
+            pstmt1.setString(1, tempCity2Name);
+            pstmt1.setString(2, city1);
+            pstmt1.executeUpdate();
+
+            System.out.println("Scambio tra le città " + city1 + " e " + city2 + " completato.");
         }
     }
 
@@ -425,32 +503,56 @@ public class EsercizioZ2 {
         }
     }
 
+    // Metodo per aggiungere una nuova città
+    public static void aggiungiNuovaCitta(Connection conn, Scanner input) throws SQLException {
+
+        System.out.print("Inserisci il nome della città: ");
+        String name = controlloInputStringhe(input);
+
+        System.out.print("Inserisci il countrycode della città: ");
+        String countryCode = controlloInputStringheConLunghezza(input, LUNGHEZZA_STRINGA_COUNTRYCODE);
+
+        System.out.print("Inserisci il distretto: ");
+        String district = controlloInputStringhe(input);
+
+        System.out.print("Inserisci il numero della popolazione: ");
+        int population = controlloInputInteri(input, false);
+
+        // SQL per inserire un nuovo paese nella tabella "country"
+        String sql = "INSERT INTO city VALUES (null, ?, ?, ?, ?)";
+
+        try (PreparedStatement pstmt = createPreparedStatement(conn, sql)) {
+            // Impostiamo i parametri nella query
+            pstmt.setString(1, name);
+            pstmt.setString(2, countryCode);
+            pstmt.setString(3, district);
+            pstmt.setInt(4, population);
+
+            // Eseguiamo l'inserimento
+            int rowsAffected = pstmt.executeUpdate();
+
+            // Controllo se l'inserimento è andato a buon fine
+            if (rowsAffected > 0) {
+                System.out.println("Nuova città aggiunto con successo.");
+            } else {
+                System.out.println("Errore nell'inserimento della nuova città.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante l'inserimento della città: " + e.getMessage());
+            throw e;
+        }
+    }
+
     // Metodo per aggiornare il numero di abitanti di una città
-    public static void aggiornaNumeroAbitanti(Connection conn, Scanner input) throws SQLException {
+    public static void aggiornaNumeroAbitantiCitta(Connection conn, Scanner input) throws SQLException {
         // SQL per aggiornare il numero di abitanti di una città in base al nome
         String sql = "UPDATE city SET population = ? WHERE name = ?";
 
         String name = "";
-        boolean cityExists = false;
-        // Continuare a chiedere il nome finché non viene trovata una città
-        // corrispondente
-        while (!cityExists) {
-            System.out.print("Inserisci il nome della città: ");
+        do {
+            System.out.print("Inserisci il nome della prima città: ");
             name = controlloInputStringhe(input);
-
-            // Verifica se la città esiste nel database
-            String checkCityQuery = "SELECT COUNT(*) FROM city WHERE name = ?";
-            try (PreparedStatement pstmtCheck = createPreparedStatement(conn, checkCityQuery)) {
-                pstmtCheck.setString(1, name);
-                ResultSet rs = pstmtCheck.executeQuery();
-
-                if (rs.next() && rs.getInt(1) > 0) {
-                    cityExists = true; // Se esiste almeno una città con quel nome, esci dal ciclo
-                } else {
-                    System.out.println("La città con nome \"" + name + "\" non esiste nel database. Riprova.");
-                }
-            }
-        }
+        } while (!esisteCitta(conn, name)); // Verifica se la città esiste nel DB
 
         System.out.print("Inserisci la popolazione della città: ");
         int popolazione = controlloInputInteri(input, false);
@@ -459,6 +561,40 @@ public class EsercizioZ2 {
             // Impostiamo i parametri: il nuovo numero di abitanti e il nome della città
             pstmt.setInt(1, popolazione);
             pstmt.setString(2, name);
+
+            // Eseguiamo l'aggiornamento
+            int rowsAffected = pstmt.executeUpdate();
+
+            // Controlliamo se è stato aggiornato almeno un record
+            if (rowsAffected > 0) {
+                System.out.println("Numero di abitanti aggiornato con successo.");
+            } else {
+                System.out.println("Nessuna città trovata con l'ID specificato.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante l'aggiornamento del numero di abitanti: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    // Metodo per aggiornare il numero di abitanti di un paese
+    public static void aggiornaNumeroAbitantiPaese(Connection conn, Scanner input) throws SQLException {
+        // SQL per aggiornare il numero di abitanti di un paese in base al code
+        String sql = "UPDATE country SET Population = ? WHERE Code = ?";
+
+        String code = "";
+        do {
+            System.out.print("Inserisci il codice del primo paese (3 caratteri): ");
+            code = controlloInputStringheConLunghezza(input, LUNGHEZZA_STRINGA_COUNTRYCODE);
+        } while (!esistePaese(conn, code)); // Verifica se il paese esiste nel DB
+
+        System.out.print("Inserisci la popolazione del paese: ");
+        int popolazione = controlloInputInteri(input, false);
+
+        try (PreparedStatement pstmt = createPreparedStatement(conn, sql)) {
+            // Impostiamo i parametri: il nuovo numero di abitanti e il code del paese
+            pstmt.setInt(1, popolazione);
+            pstmt.setString(2, code);
 
             // Eseguiamo l'aggiornamento
             int rowsAffected = pstmt.executeUpdate();
@@ -517,6 +653,20 @@ public class EsercizioZ2 {
             System.err.println("Errore durante l'eliminazione della città: " + e.getMessage());
             throw e;
         }
+    }
+
+    // Creazione della tabella di backup per 'city'
+    public static void creazioneBackupCity(Connection conn) throws SQLException {
+        String createCityBackupQuery = "CREATE TABLE IF NOT EXISTS city_backup LIKE city;";
+        Statement stmt = getStatement(conn);
+        stmt.executeUpdate(createCityBackupQuery);
+    }
+
+    // Creazione della tabella di backup per 'country'
+    public static void creazioneBackupCountry(Connection conn) throws SQLException {
+        String createCountryBackupQuery = "CREATE TABLE IF NOT EXISTS country_backup LIKE country;";
+        Statement stmt = getStatement(conn);
+        stmt.executeUpdate(createCountryBackupQuery);
     }
 
     // #endregion
@@ -581,31 +731,31 @@ public class EsercizioZ2 {
 
             switch (sceltaSottomenu) {
                 case 1:
-                    aggiornaNumeroAbitanti(conn, scanner);
+                    aggiornaNumeroAbitantiCitta(conn, scanner);
                     break;
                 case 2:
-                    // TODO
+                    aggiungiNuovaCitta(conn, scanner);
                     break;
                 case 3:
                     eliminazioneCittaSpecifica(conn, scanner);
                     break;
                 case 4:
-                    // TODO
+                    aggiornaNumeroAbitantiPaese(conn, scanner);
                     break;
                 case 5:
                     aggiungiNuovoPaese(conn, scanner);
                     break;
                 case 6:
-                    // TODO
+                    creazioneBackupCity(conn);
                     break;
                 case 7:
-                    // TODO
+                    creazioneBackupCountry(conn);
                     break;
                 case 8:
                     scambiaRecordCountry(conn, scanner);
                     break;
                 case 9:
-                    scambiaRecordCountry(conn, scanner);
+                    scambiaRecordCity(conn, scanner);
                     break;
                 case 10:
                     creaTrigger(conn);
