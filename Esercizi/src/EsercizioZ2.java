@@ -624,7 +624,7 @@ public class EsercizioZ2 {
         String district = controlloInputStringhe(input);
 
         System.out.print("Inserisci il numero della popolazione: ");
-        int population = controlloInputInteri(input);
+        Integer population = controlloInputInteri(input);
 
         // SQL per inserire un nuovo paese nella tabella "country"
         String sql = "INSERT INTO city VALUES (null, ?, ?, ?, ?)";
