@@ -94,65 +94,35 @@ public class EsercizioZ2 {
 
     // #region METODI PER IL CONTROLLO DEGLI INPUT
 
-    // Metodo per controllare l'input intero, con possibilità di inserire null
-    public static Integer controlloInputInteri(Scanner scanner, boolean allowNull) {
-        Integer valore = null; // Valore che ritorneremo (può essere null)
+    // Metodo per controllare l'input intero
+    public static Integer controlloInputInteri(Scanner scanner) {
+        Integer valore;
         do {
-            if (allowNull) {
-                String input = scanner.nextLine().trim();
-                if (input.isEmpty()) {
-                    // Se è permesso null e l'input è vuoto, ritorna null
-                    return null;
-                }
-                try {
-                    valore = Integer.parseInt(input);
-                } catch (NumberFormatException e) {
-                    System.out.print("Devi inserire un numero intero. Riprova: ");
-                }
-            } else {
-                while (!scanner.hasNextInt()) {
-                    System.out.print("Devi inserire un numero intero. Riprova: ");
-                    scanner.next();
-                }
-                valore = scanner.nextInt();
+            while (!scanner.hasNextInt()) {
+                System.out.print("Devi inserire un numero intero. Riprova ");
+                scanner.next();
             }
-
-            if (valore != null && valore < 0) {
+            valore = scanner.nextInt();
+            if (valore < 0) {
                 System.out.print("Il numero non può essere negativo. Riprova: ");
             }
-        } while (valore != null && valore < 0);
-
+        } while (valore < 0);
         return valore;
     }
 
     // Metodo per controllare l'input double, con possibilità di inserire null
-    public static Double controlloInputDouble(Scanner scanner, boolean allowNull) {
-        Double valore = null; // Valore che ritorneremo (può essere null)
+    public static Double controlloInputDouble(Scanner scanner) {
+        Double valore;
         do {
-            if (allowNull) {
-                String input = scanner.nextLine().trim();
-                if (input.isEmpty()) {
-                    // Se è permesso null e l'input è vuoto, ritorna null
-                    return null;
-                }
-                try {
-                    valore = Double.parseDouble(input);
-                } catch (NumberFormatException e) {
-                    System.out.print("Devi inserire un numero decimale valido. Riprova: ");
-                }
-            } else {
-                while (!scanner.hasNextDouble()) {
-                    System.out.print("Devi inserire un numero decimale valido. Riprova: ");
-                    scanner.next(); // Consuma l'input errato
-                }
-                valore = scanner.nextDouble();
+            while (!scanner.hasNextDouble()) {
+                System.out.print("Devi inserire un numero decimale. Riprova ");
+                scanner.next();
             }
-
-            if (valore != null && valore < 0) {
+            valore = scanner.nextDouble();
+            if (valore < 0) {
                 System.out.print("Il numero non può essere negativo. Riprova: ");
             }
-        } while (valore != null && valore < 0);
-
+        } while (valore < 0);
         return valore;
     }
 
@@ -184,7 +154,7 @@ public class EsercizioZ2 {
     }
 
     // Metodo per verificare se un paese esiste nel database
-    private static boolean esistePaese(Connection conn, String countryCode) throws SQLException {
+    public static boolean esistePaese(Connection conn, String countryCode) throws SQLException {
         String query = "SELECT COUNT(*) FROM country WHERE Code = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, countryCode);
@@ -199,7 +169,7 @@ public class EsercizioZ2 {
     }
 
     // Metodo per verificare se una città esiste nel database
-    private static boolean esisteCitta(Connection conn, String cityName) throws SQLException {
+    public static boolean esisteCitta(Connection conn, String cityName) throws SQLException {
         String query = "SELECT COUNT(*) FROM city WHERE Name = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, cityName);
@@ -419,6 +389,32 @@ public class EsercizioZ2 {
         System.out.println("TRIGGER AGGIUNTO CON SUCCESSO!!! BRAVO");
     }
 
+    // Metodo di stampa tabella city_log
+    public static void stampaTabellaCityLog(Connection conn) {
+        try {
+            String queryCityLog = "SELECT * FROM city_log";
+            PreparedStatement pstmt = createPreparedStatement(conn, queryCityLog);
+            ResultSet rs = pstmt.executeQuery();
+            stampaDati(rs);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Metodo di stampa tabella country_log
+    public static void stampaTabellaCountryLog(Connection conn) {
+        try {
+            String queryCountryLog = "SELECT * FROM country_log";
+            PreparedStatement pstmt = createPreparedStatement(conn, queryCountryLog);
+            ResultSet rs = pstmt.executeQuery();
+            stampaDati(rs);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // Metodo per aggiungere un nuovo paese
     public static void aggiungiNuovoPaese(Connection conn, Scanner input) throws SQLException {
 
@@ -435,22 +431,22 @@ public class EsercizioZ2 {
         String region = controlloInputStringhe(input);
 
         System.out.print("Inserisci la superficie: ");
-        Double surfaceArea = controlloInputDouble(input, false);
+        Double surfaceArea = controlloInputDouble(input);
 
-        System.out.print("Inserisci l'anno di indipendenza (può essere null): ");
-        int indepYear = controlloInputInteri(input, true);
+        System.out.print("Inserisci l'anno di indipendenza: ");
+        Integer indepYear = controlloInputInteri(input);
 
         System.out.print("Inserisci il numero della popolazione: ");
-        int population = controlloInputInteri(input, false);
+        Integer population = controlloInputInteri(input);
 
-        System.out.print("Inserisci l'aspettativa di vita (può essere null): ");
-        Double lifeExpectancy = controlloInputDouble(input, true);
+        System.out.print("Inserisci l'aspettativa di vita: ");
+        Integer lifeExpectancy = controlloInputInteri(input); 
 
-        System.out.print("Inserisci GNP (può essere null): ");
-        Double gnp = controlloInputDouble(input, true);
+        System.out.print("Inserisci GNP: ");
+        Double gnp = controlloInputDouble(input);
 
-        System.out.print("Inserisci GNP-OLD (può essere null): ");
-        Double gnpOld = controlloInputDouble(input, true);
+        System.out.print("Inserisci GNP-OLD: ");
+        Double gnpOld = controlloInputDouble(input);
 
         System.out.print("Inserisci il Local Name: ");
         String localName = controlloInputStringhe(input);
@@ -458,11 +454,11 @@ public class EsercizioZ2 {
         System.out.print("Inserisci il governament: ");
         String governmentForm = controlloInputStringhe(input);
 
-        System.out.print("Inserisci headOfState (può essere null): ");
-        String headOfState = input.nextLine(); // nessun controllo perchè permette campi null
+        System.out.print("Inserisci headOfState: ");
+        String headOfState = controlloInputStringhe(input); 
 
         System.out.print("Inserisci capital (può essere null): ");
-        int capital = controlloInputInteri(input, true);
+        Integer capital = controlloInputInteri(input);
 
         System.out.print("Inserisci code2: ");
         String code2 = controlloInputStringheConLunghezza(input, LUNGHEZZA_STRINGA_COUNTRYCODE2);
@@ -518,7 +514,7 @@ public class EsercizioZ2 {
         String district = controlloInputStringhe(input);
 
         System.out.print("Inserisci il numero della popolazione: ");
-        int population = controlloInputInteri(input, false);
+        int population = controlloInputInteri(input);
 
         // SQL per inserire un nuovo paese nella tabella "country"
         String sql = "INSERT INTO city VALUES (null, ?, ?, ?, ?)";
@@ -557,7 +553,7 @@ public class EsercizioZ2 {
         } while (!esisteCitta(conn, name)); // Verifica se la città esiste nel DB
 
         System.out.print("Inserisci la popolazione della città: ");
-        int popolazione = controlloInputInteri(input, false);
+        int popolazione = controlloInputInteri(input);
 
         try (PreparedStatement pstmt = createPreparedStatement(conn, sql)) {
             // Impostiamo i parametri: il nuovo numero di abitanti e il nome della città
@@ -591,7 +587,7 @@ public class EsercizioZ2 {
         } while (!esistePaese(conn, code)); // Verifica se il paese esiste nel DB
 
         System.out.print("Inserisci la popolazione del paese: ");
-        int popolazione = controlloInputInteri(input, false);
+        int popolazione = controlloInputInteri(input);
 
         try (PreparedStatement pstmt = createPreparedStatement(conn, sql)) {
             // Impostiamo i parametri: il nuovo numero di abitanti e il code del paese
@@ -622,7 +618,7 @@ public class EsercizioZ2 {
         boolean idExists = false;
         while (!idExists) {
             System.out.print("Inserisci l'ID della città: ");
-            cityId = controlloInputInteri(input, false);
+            cityId = controlloInputInteri(input);
 
             // Verifica se la città esiste nel database
             String checkCityQuery = "SELECT COUNT(*) FROM city WHERE ID = ?";
@@ -710,7 +706,7 @@ public class EsercizioZ2 {
             System.out.println("3. Sotto-menu gestione database");
             System.out.println("4. Esci");
             System.out.print("Scegli un'opzione (1-4): ");
-            scelta = controlloInputInteri(scanner, false);
+            scelta = controlloInputInteri(scanner);
             scanner.nextLine();
 
             switch (scelta) {
@@ -749,10 +745,11 @@ public class EsercizioZ2 {
             System.out.println("7. Creare una tabella backup per country. (cancella vecchio backupCountry)");
             System.out.println("8. Scambiare di posto due record nelle tabella country.");
             System.out.println("9. Scambiare di posto due record nelle tabella city.");
-            System.out.println("10. Aggiungere un Trigger per quando viene eliminata una city o un country.");
+            System.out.println(
+                    "10. Aggiungere un Trigger per quando viene eliminata una city o un country e stampare tabbelle prod.");
             System.out.println("0. Torna al menu principale :v ");
             System.out.print("Scegli un'opzione (0-9): ");
-            sceltaSottomenu = controlloInputInteri(scanner, false);
+            sceltaSottomenu = controlloInputInteri(scanner);
             scanner.nextLine();
 
             switch (sceltaSottomenu) {
@@ -785,6 +782,8 @@ public class EsercizioZ2 {
                     break;
                 case 10:
                     creaTrigger(conn);
+                    stampaTabellaCityLog(conn);
+                    stampaTabellaCountryLog(conn);
                     break;
                 case 0:
                     System.out.println("Tornando al menu principale...");
