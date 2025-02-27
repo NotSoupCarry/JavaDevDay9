@@ -125,7 +125,6 @@ public class EsercizioZ2 {
                 System.out.print("Il numero non può essere negativo. Riprova: ");
             }
         } while (valore < 0);
-        scanner.next();
         return valore;
     }
 
