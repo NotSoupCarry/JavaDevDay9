@@ -415,6 +415,8 @@ public class EsercizioZ2 {
         stmt.executeUpdate("DROP TRIGGER IF EXISTS before_country_delete");
         stmt.executeUpdate("CREATE TRIGGER before_country_delete BEFORE DELETE ON country " +
                 "FOR EACH ROW INSERT INTO country_log VALUES (OLD.Code, OLD.Name, OLD.Population)");
+
+        System.out.println("TRIGGER AGGIUNTO CON SUCCESSO!!! BRAVO");
     }
 
     // Metodo per aggiungere un nuovo paese
